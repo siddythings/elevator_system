@@ -8,8 +8,8 @@ class Elevator(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return "%s, %s"(self.id, self.updated_at)
+    # def __str__(self):
+    #     return "%s"(self.id)
 
 
 class Request(models.Model):
