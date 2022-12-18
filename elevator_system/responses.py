@@ -1,7 +1,6 @@
 from datetime import datetime
 from time import mktime
 
-from bson import ObjectId
 from rest_framework import status
 from rest_framework.response import Response
 

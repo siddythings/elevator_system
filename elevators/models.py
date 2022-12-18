@@ -18,9 +18,9 @@ class Request(models.Model):
     direction = models.CharField(max_length=5)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return "%s, %s"(self.elevator, self.updated_at)
+    is_checked = models.BooleanField(default=False)
+    # def __str__(self):
+    #     return "%s, %s"(self.elevator, self.updated_at)
 
 
 class MaintenanceStatus(models.Model):
