@@ -4,7 +4,7 @@ from django.db import models
 class Elevator(models.Model):
     current_floor = models.PositiveIntegerField()
     direction = models.CharField(max_length=5)
-    maintenance_status = models.CharField(max_length=20)
+    maintenance_status = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now=True)
 
