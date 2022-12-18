@@ -14,7 +14,7 @@ urlpatterns = [
         rest_views.ElevatorStatusRequestView.as_view(),
     ),
     path(
-        "api/elevators-maintenance/{elevator_id}/",
+        "api/elevators-maintenance/<elevator_id>/",
         rest_views.ElevatorMaintenanceStatusView.as_view(),
     ),
 ]

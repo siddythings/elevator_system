@@ -4,6 +4,7 @@ from .constants import ElevatorUpdateType
 
 
 class ElevatorsServicesCls:
+    # Update elevators current floor after any operation perform
     def update_elevators_current_floor(
         self, elevator_id, current_floor, direction=ElevatorUpdateType.Increase
     ):
@@ -16,9 +17,11 @@ class ElevatorsServicesCls:
                 current_floor=current_floor - 1, direction=direction
             )
 
+    # Update request to id checked to mark completed
     def update_request_to_is_checked(self, request_id):
         Request.objects.filter(id=request_id).update(is_checked=True)
 
+    # Next destination for the elevators
     def get_elevators_next_request(self, elevator_id, elevator_status):
         first_request = Request.objects.filter(
             elevator_id=int(elevator_id), is_checked=False

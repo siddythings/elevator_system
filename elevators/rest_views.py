@@ -39,6 +39,17 @@ class ElevatorInitializeView(APIView):
 class ElevatorRequestsView(APIView):
     def post(self, request, elevator_id):
         request_data = request.data
+        elevator = get_object_or_404(Elevator, id=int(elevator_id))
+        elevator_serializer = ElevatorSerializer(elevator).data
+        if not elevator_serializer.get("maintenance_status"):
+            return responses.BadRequestResponse(
+                data={
+                    "direction": "Elevator On Maintence",
+                    "distination": False,
+                    "current_floor": 0,
+                },
+                message="Elevator On Maintence",
+            )
         floor = request_data.get("floor")
         if not floor or not str(floor) != "0":
             return responses.BadRequestResponse(message="Missing parameter: floor")
@@ -53,17 +64,28 @@ class ElevatorRequestsView(APIView):
         serializer = RequestSerializer(requests)
         return responses.SuccessResponse(data=serializer.data, message="Elevator")
 
+    def get(self, request, elevator_id):
+        request_data = request.data
+        requests = Request.objects.filter(
+            elevator_id=elevator_id, is_checked=False
+        ).order_by("created_at")
+        serializer = RequestSerializer(requests, many=True)
+        return responses.SuccessResponse(data=serializer.data, message="Elevator")
+
 
 class ElevatorStatusRequestView(APIView):
     def post(self, request, elevator_id):
         elevator = get_object_or_404(Elevator, id=int(elevator_id))
         elevator_serializer = ElevatorSerializer(elevator).data
         if not elevator_serializer.get("maintenance_status"):
-            return {
-                "direction": "Elevator On Maintence",
-                "distination": False,
-                "current_floor": 0,
-            }
+            return responses.BadRequestResponse(
+                data={
+                    "direction": "Elevator On Maintence",
+                    "distination": False,
+                    "current_floor": 0,
+                },
+                message="Elevator On Maintence",
+            )
         elevator_next_request = ElevatorsServices.get_elevators_next_request(
             elevator_id, elevator_serializer
         )
@@ -73,19 +95,19 @@ class ElevatorStatusRequestView(APIView):
 class ElevatorMaintenanceStatusView(APIView):
     def post(self, request, elevator_id):
         request_data = request.data
-        MaintenanceStatus.objects.create(
+        MaintenanceStatus.objects.update_or_create(
             elevator_id=elevator_id,
             status=request_data.get("status"),
             reason=request_data.get("reason"),
         )
 
         if request_data.get("status") == ElevatorMaintenanceUpdateType.Available:
-            Elevator.objects.filter(id=elevator_id).update(
+            Elevator.objects.filter(id=int(elevator_id)).update(
                 maintenance_status=ElevatorMaintenanceUpdateType.Available
             )
         else:
-            Elevator.objects.filter(id=elevator_id).update(
+            Elevator.objects.filter(id=int(elevator_id)).update(
                 maintenance_status=ElevatorMaintenanceUpdateType.OnMaintenance
             )
 
-        return responses.SuccessResponse(data={}, message="Elevator")
+        return responses.SuccessResponse(data=request_data, message="Elevator")
